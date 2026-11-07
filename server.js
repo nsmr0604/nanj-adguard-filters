@@ -8,6 +8,7 @@ const fs = require("fs")
 const tmp = require("tmp")
 const path = require("path")
 const helmet = require("helmet")
+const filtersNanjWiki = require("./filters")
 const {
   JSDOM
 } = require("jsdom")
@@ -47,13 +48,14 @@ function getNanjWiki(nanjWikiUrl, savePath, filterTitle) {
                     const savePathTmp = path.resolve(path.dirname(savePath), path.basename(tmp.tmpNameSync()))
                     try {
                         fs.writeFileSync(savePathTmp, filterBody)
-                        fs.rename(savePathTmp, savePath, e => { return reject(e) })
+                        fs.renameSync(savePathTmp, savePath)
                     }
                     catch(e) {
                         return reject(e)
                     }
                     return resolve(filterBody)
                 }
+                return reject(`filter not found: ${filterTitle}`)
         })
     }).catch(e => {
         logger.error(e)
@@ -66,29 +68,6 @@ function getNanjWiki(nanjWikiUrl, savePath, filterTitle) {
     }).catch (e => {
         logger.fatal(e)
     })
-}
-
-const filtersNanjWiki = {
-    'nanj-kaishuu-filter.txt': {
-        url: 'https://wikiwiki.jp/nanj-adguard/%E3%81%AA%E3%82%93J%E6%94%B9%E4%BF%AE%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF%E3%83%BC',
-        title: '! Title: なんJ改修フィルター'
-    },
-    'nanj-kaishuu-dns-filter.txt': {
-        url: 'https://wikiwiki.jp/nanj-adguard/%E3%81%AA%E3%82%93J%E6%94%B9%E4%BF%AE%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF%E3%83%BC',
-        title: '! Title: なんJ改修DNSフィルター'
-    },
-    'supplement-rules.txt': {
-        url: 'https://wikiwiki.jp/nanj-adguard/%E3%81%AA%E3%82%93J%E6%8B%A1%E5%BC%B5%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF%E3%83%BC',
-        title: '! Title: なんJ拡張フィルター：一般ルール'
-    },
-    'DNS-rules.txt': {
-        url: 'https://wikiwiki.jp/nanj-adguard/%E3%81%AA%E3%82%93J%E6%8B%A1%E5%BC%B5%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF%E3%83%BC',
-        title: '! Title: なんJ拡張フィルター：DNSルール'
-    },
-    'paranoid-rules.txt': {
-        url: 'https://wikiwiki.jp/nanj-adguard/%E3%81%AA%E3%82%93J%E6%8B%A1%E5%BC%B5%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF%E3%83%BC',
-        title: '! Title: なんJ拡張フィルター：Paranoidルール'
-    }
 }
 
 app.get("/healthz", (req, res) => {
@@ -108,8 +87,8 @@ for(const [ k, v ] of Object.entries(filtersNanjWiki)) {
     });
 }
 
-const now = new Date(), y = now.getFullYear(), m = ('0' + (now.getMonth() + 1)).slice(-2)
 app.get("/280blocker_adblock.txt", (request, response) => {
+    const now = new Date(), y = now.getFullYear(), m = ('0' + (now.getMonth() + 1)).slice(-2)
     logger.debug('GET /280blocker_adblock.txt')
     response.redirect(`https://280blocker.net/files/280blocker_adblock_${y}${m}.txt`)
 });
@@ -120,6 +99,6 @@ app.use((req, res, next) => {
     next(error);
 })
 
-const listener = app.listen(process.env.PORT, () => {
+const listener = app.listen(process.env.PORT || 3000, '0.0.0.0', () => {
     console.log("Your app is listening on port " + listener.address().port)
 });
