@@ -1,8 +1,12 @@
 # nanj-adguard-filters
 [なんJ AdGuard部Wiki](https://wikiwiki.jp/nanj-adguard/)に掲載されているフィルタをフェッチして、Adguardカスタムフィルタに設定できるリンク形式にするnode.jsスクリプト
 
-[Render](https://render.com/)・[Fly.io](https://fly.io/)・[Railway](https://railway.app/)などのNode.js/Docker対応のホスティングで動作します。
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/nsmr0604/nanj-adguard-filters)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/nsmr0604/nanj-adguard-filters)
 
+Heroku・[Render](https://render.com/)・[Fly.io](https://fly.io/)・[Railway](https://railway.app/)などのNode.js/Docker対応のホスティングで動作します。
+
+- Heroku: 上のボタンからデプロイ(`app.json`/`Procfile`使用)。
 - Render: リポジトリを接続すると`render.yaml`が使われます。
 - Docker: `docker build -t nanj . && docker run -p 3000:3000 nanj`
 - 手動: `npm install && npm start` (`PORT`環境変数でポート指定、既定3000)
